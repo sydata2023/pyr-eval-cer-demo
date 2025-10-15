@@ -89,16 +89,16 @@
       <strong>CER Balance:</strong>
       <span id="balance"></span>
     </div>
-  </div>
+ </div>
 
   <script>
     // Set this to your deployed API URL after you deploy the backend
-    wwindow.PYREVAL_API = "https://pyr-eval-cer-demo.onrender.com";
+  wwindow.PYREVAL_API = "https://pyr-eval-cer-demo.onrender.com";
   
 
     document.getElementById('analyzeBtn').addEventListener('click', async () => {
       const claim = document.getElementById('claim').value;
-      const evidence = document.getElementById('evidence').value;
+cons evidence = document.getElementById('evidence').value;
       const reasoning = document.getElementById('reasoning').value;
 
       if (!window.PYREVAL_API) {
@@ -110,7 +110,7 @@
         const resp = await fetch(window.PYREVAL_API + '/api/analyze', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+           'Content-Type': 'application/json'
           },
           body: JSON.stringify({ claim, evidence, reasoning })
         });
