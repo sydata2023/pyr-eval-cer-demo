@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PyrEval CER Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 1em;
+    }
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 8px;
+      margin-top: 4px;
+    }
+    button {
+      margin-top: 1em;
+      padding: 10px 15px;
+      font-size: 16px;
+    }
+    .result-section {
+      margin-top: 2em;
+    }
+    .pill {
+      display: inline-block;
+      background: #e0e0e0;
+      padding: 4px 8px;
+      margin: 2px;
+      border-radius: 12px;
+    }
+    .pill.missing {
+      background: #f8d7da;
+    }
+    .pill.hit {
+      background: #d4edda;
+    }
+    .nudge {
+      margin-top: 0.5em;
+      padding: 8px;
+      background: #fff3cd;
+      border-left: 4px solid #ffeeba;
+    }
+  </style>
+</head>
+<body>
+  <h1>PyrEval CER Demo</h1>
+  <div>
+    <label for="claim">Claim:</label>
+    <textarea id="claim" placeholder="Enter your claim..."></textarea>
+  </div>
+  <div>
+    <label for="evidence">Evidence:</label>
+    <textarea id="evidence" placeholder="Enter your evidence..."></textarea>
+  </div>
+  <div>
+    <label for="reasoning">Reasoning:</label>
+    <textarea id="reasoning" placeholder="Enter your reasoning..."></textarea>
+  </div>
+  <button id="analyzeBtn">Analyze with PyrEval</button>
+
+  <div id="results" class="result-section" style="display:none;">
+    <h2>Results</h2>
+    <div>
+      <strong>Hits:</strong>
+      <span id="hits"></span>
+    </div>
+    <div>
+      <strong>Gaps:</strong>
+      <span id="gaps"></span>
+    </div>
+    <div>
+      <strong>Nudges:</strong>
+      <div id="nudges"></div>
+    </div>
+    <div>
+      <strong>CER Balance:</strong>
+      <span id="balance"></span>
+    </div>
+  </div>
+
+  <script>
+    // Set this to your deployed API URL after you deploy the backend
+    window.PYREVAL_API = window.PYREVAL_API || "";
+
+    document.getElementById('analyzeBtn').addEventListener('click', async () => {
+      const claim = document.getElementById('claim').value;
+      const evidence = document.getElementById('evidence').value;
+      const reasoning = document.getElementById('reasoning').value;
+
+      if (!window.PYREVAL_API) {
+        alert('API endpoint is not configured yet.');
+        return;
+      }
+
+      try {
+        const resp = await fetch(window.PYREVAL_API + '/api/analyze', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ claim, evidence, reasoning })
+        });
+        const data = await resp.json();
+        // Display results
+        document.getElementById('results').style.display = 'block';
+        // Hits and gaps
+        const hits = data.hits || [];
+        const gaps = data.gaps || [];
+        document.getElementById('hits').innerHTML = hits.map(cu => '<span class="pill hit">' + cu.label + '</span>').join('');
+        document.getElementById('gaps').innerHTML = gaps.map(cu => '<span class="pill missing">' + cu.label + '</span>').join('');
+        // Nudges
+        const nudges = data.nudges || [];
+        document.getElementById('nudges').innerHTML = nudges.map(n => '<div class="nudge">' + n.text + '</div>').join('');
+        // CER balance
+        const cer = data.cer || {};
+        const balanceParts = [];
+        ['claim','evidence','reasoning'].forEach(key => {
+          balanceParts.push(key.charAt(0).toUpperCase() + key.slice(1) + ': ' + (cer[key] ? '✓' : '✗'));
+        });
+        document.getElementById('balance').textContent = balanceParts.join(' | ');
+      } catch (error) {
+        alert('Error communicating with the API: ' + error);
+      }
+    });
+  </script>
+</body>
+</html>
