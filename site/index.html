@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>PyrEval CER Demo</title>
+  <title>ArgueLab: Learn Science Through Argumentation</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
@@ -28,8 +28,6 @@
     button {
       margin-top: 1em;
       padding: 10px 15px;
-     
-      ;
     }
     .result-section {
       margin-top: 2em;
@@ -56,7 +54,7 @@
   </style>
 </head>
 <body>
-  <h1>PyrEval CER Demo</h1>
+  <h1>ArgueLab: Learn Science Through Argumentation</h1>
   <div>
     <label for="claim">Claim:</label>
     <textarea id="claim" placeholder="Enter your claim..."></textarea>
@@ -69,7 +67,7 @@
     <label for="reasoning">Reasoning:</label>
     <textarea id="reasoning" placeholder="Enter your reasoning..."></textarea>
   </div>
-  <button id="analyzeBtn">Analyze with PyrEval</button>
+  <button id="analyzeBtn">Analyze with ArgueLab</button>
 
   <div id="results" class="result-section" style="display:none;">
     <h2>Results</h2>
@@ -89,16 +87,15 @@
       <strong>CER Balance:</strong>
       <span id="balance"></span>
     </div>
- </div>
+  </div>
 
   <script>
     // Set this to your deployed API URL after you deploy the backend
-  wwindow.PYREVAL_API = "https://pyr-eval-cer-demo.onrender.com";
-  
+    window.PYREVAL_API = "https://pyr-eval-cer-demo.onrender.com";
 
     document.getElementById('analyzeBtn').addEventListener('click', async () => {
       const claim = document.getElementById('claim').value;
-cons evidence = document.getElementById('evidence').value;
+      const evidence = document.getElementById('evidence').value;
       const reasoning = document.getElementById('reasoning').value;
 
       if (!window.PYREVAL_API) {
@@ -110,7 +107,7 @@ cons evidence = document.getElementById('evidence').value;
         const resp = await fetch(window.PYREVAL_API + '/api/analyze', {
           method: 'POST',
           headers: {
-           'Content-Type': 'application/json'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({ claim, evidence, reasoning })
         });
@@ -128,7 +125,7 @@ cons evidence = document.getElementById('evidence').value;
         // CER balance
         const cer = data.cer || {};
         const balanceParts = [];
-        ['claim','evidence','reasoning'].forEach(key => {
+        ['claim', 'evidence', 'reasoning'].forEach(key => {
           balanceParts.push(key.charAt(0).toUpperCase() + key.slice(1) + ': ' + (cer[key] ? '✓' : '✗'));
         });
         document.getElementById('balance').textContent = balanceParts.join(' | ');
